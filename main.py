@@ -2,6 +2,8 @@ import asyncio
 import logging
 import sys
 from os import getenv
+import json
+import requests
 
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.enums import ParseMode
@@ -12,6 +14,7 @@ from buttons import menu
 from aiogram.filters import Command
 from aiogram import Router, F, Bot
 from inline import MyCallback, create_markup
+
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = str("7195481777:AAH2wTRKtoWxQ5Fos84kw75eLjCy31JoBno")
@@ -37,10 +40,27 @@ async def show_category(message: types.Message):
     await message.answer(f"Qaysi oyni tanlamoqchisiz", reply_markup=create_markup())
 
 
-@dp.callback_query(MyCallback.filter(F.foo == "demo"))
+@dp.callback_query(MyCallback.filter(F.foo == "yanvar"))
 async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
     # await query.answer(f"Hello")
-    await query.message.answer(f"Hello")
+    req=requests.get("http://45.137.148.241/facilities/")
+    js_req=json.loads(req.text)
+    list = []
+    for i in js_req:
+        list.append(i["image"])
+
+    # raw = Message.list[4].file_id
+    # path = raw+".jpg"
+    # file_info = Bot.get_file(raw)
+    # downloaded_file = Bot.download_file(file_info.file_path)
+    # with open(path,'wb') as new_file:
+    #     new_file.write(downloaded_file)
+    
+    # file_info = await Bot.get_file(photo[len(photo) - 1].file_id)
+    # new_photo = (await Bot.download_file(file_info.file_path)).read()
+    # print(list[4])
+    await query.message.answer(f" Hello")
+    # await query.message.answer(f"{new_file} Hello")
     print("bar = ", callback_data.bar)
 
 
