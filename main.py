@@ -41,25 +41,33 @@ async def command_start_handler(message: Message) -> None:
 async def show_category(message: types.Message):
     await message.answer(f"Qaysi oyni tanlamoqchisiz", reply_markup=create_markup())
 
+req=requests.get("http://45.137.148.241/facilities/")
+js_req=json.loads(req.text)
+for i in js_req:
+    pass
+
 
 @dp.callback_query(MyCallback.filter(F.foo == "yanvar"))
 async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
     req=requests.get("http://45.137.148.241/facilities/")
     js_req=json.loads(req.text)
-    list = []
-    for i in js_req:
-        list.append(i["image"])
-    await query.message.answer_photo(
-            URLInputFile(list[7]),
-            caption=f"Hello",
-            # reply_markup=get_callback_btns(
-            #     btns={
-            #         "Удалить": f"delete_{product.id}",
-            #         "Изменить": f"change_{product.id}",
-            #     },
-            #     sizes=(2,)
-            # ),
-    )
+    a=list(filter(lambda x: x['month']=="yanvar", js_req))
+    if a:
+        for i in a:
+                await query.message.answer_photo(
+                URLInputFile(i["image"]),
+                caption=f"🕋 Umra sayohati haqida ma'lumotlar \n\n📜<b>Tavsif</b>: {i['description']}\n📆<b>Oy</b>: {i['month']}\n🔢<b>Kun</b>: {i['days']}\n📆<b>Boshlanish sanasi</b>: {i['_from']}\n📆<b>Tugash sanasi</b>: {i['_to']}\n💲<b>Narxi</b>: {i['price']}\n✅<b>Xizmatlar</b>: {i['included_services']}\n📱<b>Aloqa</b>: {i['contact']}\n📱<b>Telegram</b>: {i['telegram']}\n📱<b>Instagram</b>: {i['instagram']}\n🧮<b>Soni</b>: {i['count']}\n",
+                # reply_markup=get_callback_btns(
+                #     btns={
+                #         "Удалить": f"delete_{product.id}",
+                #         "Изменить": f"change_{product.id}",
+                #     },
+                #     sizes=(2,)
+                # ),
+                )
+    else:
+        await query.message.answer(f"Bu oyda sayohat mavjud emas")
+
 
 
 
@@ -67,20 +75,22 @@ async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
 async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
     req=requests.get("http://45.137.148.241/facilities/")
     js_req=json.loads(req.text)
-    list = []
-    for i in js_req:
-        list.append(i["image"])
-    await query.message.answer_photo(
-            URLInputFile(list[7]),
-            caption=f"Hello",
-            # reply_markup=get_callback_btns(
-            #     btns={
-            #         "Удалить": f"delete_{product.id}",
-            #         "Изменить": f"change_{product.id}",
-            #     },
-            #     sizes=(2,)
-            # ),
-    )
+    a=list(filter(lambda x: x['month']=="fevral", js_req))
+    if a:
+        for i in a:
+                await query.message.answer_photo(
+                URLInputFile(i["image"]),
+                caption=f"🕋 Umra sayohati haqida ma'lumotlar \n\n📜<b>Tavsif</b>: {i['description']}\n📆<b>Oy</b>: {i['month']}\n🔢<b>Kun</b>: {i['days']}\n📆<b>Boshlanish sanasi</b>: {i['_from']}\n📆<b>Tugash sanasi</b>: {i['_to']}\n💲<b>Narxi</b>: {i['price']}\n✅<b>Xizmatlar</b>: {i['included_services']}\n📱<b>Aloqa</b>: {i['contact']}\n📱<b>Telegram</b>: {i['telegram']}\n📱<b>Instagram</b>: {i['instagram']}\n🧮<b>Soni</b>: {i['count']}\n",
+                # reply_markup=get_callback_btns(
+                #     btns={
+                #         "Удалить": f"delete_{product.id}",
+                #         "Изменить": f"change_{product.id}",
+                #     },
+                #     sizes=(2,)
+                # ),
+                )
+    else:
+        await query.message.answer(f"Bu oyda sayohat mavjud emas")
   
 
 

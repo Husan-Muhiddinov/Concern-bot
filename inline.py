@@ -1,6 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+import paginator
+# from telegram_bot_pagination import InlineKeyboardPaginator
 
 class MyCallback(CallbackData, prefix="my"):
     foo: str
@@ -71,6 +73,103 @@ def create_markup():
     builder.adjust(2, )
 
     return builder.as_markup()
+
+
+
+
+
+
+
+def pages(Paginator: paginator):
+    btns = dict()
+    if Paginator.has_previous():
+        btns["◀ Пред."] = "previous"
+
+    if paginator.has_next():
+        btns["След. ▶"] = "next"
+
+    return btns
+
+
+async def products(session, level, category, page):
+    req=requests.get("http://45.137.148.241/facilities/")
+    js_req=json.loads(req.text)
+    products=list(filter(lambda x: x['month']=="fevral", js_req))
+    # products = await orm_get_products(session, category_id=category)
+
+    Paginator = paginator(products, page=page)
+    product = paginator.get_page()[0]
+
+    image = InputMediaPhoto(
+        media=product.image,
+        caption=f"<strong>{product.name}\
+                </strong>\n{product.description}\nСтоимость: {round(product.price, 2)}\n\
+                <strong>Товар {paginator.page} из {paginator.pages}</strong>",
+    )
+
+    pagination_btns = pages(paginator)
+
+    kbds = get_products_btns(
+        level=level,
+        category=category,
+        page=page,
+        pagination_btns=pagination_btns,
+        product_id=product.id,
+    )
+
+    return image, kbds
+
+
+
+
+class MenuCallBack(CallbackData, prefix="menu"):
+    level: int
+    menu_name: str
+    category: int | None = None
+    page: int = 1
+    product_id: int | None = None
+
+
+def get_products_btns(
+    *,
+    level: int,
+    category: int,
+    page: int,
+    pagination_btns: dict,
+    product_id: int,
+    sizes: tuple[int] = (2, 1)
+):
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.add(InlineKeyboardButton(text='Назад',
+                callback_data=MenuCallBack(level=level-1, menu_name='catalog').pack()))
+    keyboard.add(InlineKeyboardButton(text='Корзина 🛒',
+                callback_data=MenuCallBack(level=3, menu_name='cart').pack()))
+    keyboard.add(InlineKeyboardButton(text='Купить 💵',
+                callback_data=MenuCallBack(level=level, menu_name='add_to_cart', product_id=product_id).pack()))
+
+    keyboard.adjust(*sizes)
+
+    row = []
+    for text, menu_name in pagination_btns.items():
+        if menu_name == "next":
+            row.append(InlineKeyboardButton(text=text,
+                    callback_data=MenuCallBack(
+                        level=level,
+                        menu_name=menu_name,
+                        category=category,
+                        page=page + 1).pack()))
+        
+        elif menu_name == "previous":
+            row.append(InlineKeyboardButton(text=text,
+                    callback_data=MenuCallBack(
+                        level=level,
+                        menu_name=menu_name,
+                        category=category,
+                        page=page - 1).pack()))
+
+    return keyboard.row(*row).as_markup()
+
 
 
 # async def subcategories_keyboard(subcategories):
